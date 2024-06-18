@@ -1,5 +1,6 @@
 package org.example.game.orchestration
 
+import org.example.common.valueObject.ObjectId
 import org.example.game.domain.Game
 import org.example.game.domain.GameData
 import org.example.game.domain.GameStatus
@@ -9,35 +10,33 @@ import java.util.UUID
 
 // Port
 interface GameOrchestrator {
-    fun getGameUUID(): UUID
+    fun getGameId(): ObjectId
     fun playMatch()
     fun getWinner(): Player
     fun createNewGame(gameData: GameData)
 }
 
 // Adapter
-// TODO Est-ce que je dois isoler GameSpectator (dans son propre adaptateur ?) & Stadium différement => et si oui comment ?
 class GameOrchestratorAdapter private constructor(
-    // TODO : pourquoi c'est initialisé dans le constructeur  et pas dans les propriétés de classe ?
     private val repository: Repository
 ) : GameOrchestrator {
     private lateinit var game: Game;
 
-    private constructor(repository: Repository, uuid: UUID) : this(repository) {
-        game = repository.findById(uuid)
+    private constructor(repository: Repository, id: ObjectId) : this(repository) {
+        game = repository.findById(id)
     }
 
     private constructor(repository: Repository, gameData: GameData) : this(repository) {
-        game = Game(gameData.firstPlayer, gameData.secondPlayer)
+        createNewGame(gameData)
     }
 
     companion object {
         fun create(repository: Repository, gameData: GameData): GameOrchestrator = GameOrchestratorAdapter(repository, gameData)
-        fun load(repository: Repository, uuid: UUID): GameOrchestrator = GameOrchestratorAdapter(repository, uuid)
+        fun load(repository: Repository, id: ObjectId): GameOrchestrator = GameOrchestratorAdapter(repository, id)
     }
 
-    override fun getGameUUID(): UUID {
-        return game.getUUID()
+    override fun getGameId(): ObjectId {
+        return game.id
     }
 
     override fun playMatch() {
@@ -59,6 +58,6 @@ class GameOrchestratorAdapter private constructor(
     }
 
     override fun createNewGame(gameData: GameData) {
-        game = Game(gameData.firstPlayer, gameData.secondPlayer)
+        game = Game.create(gameData.firstPlayer, gameData.secondPlayer)
     }
 }

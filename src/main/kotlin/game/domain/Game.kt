@@ -1,7 +1,7 @@
 package org.example.game.domain
 
-import org.example.common.interfaces.UUIDInterface
-import java.util.UUID
+import org.example.common.valueObject.ObjectId
+import org.example.stadium.domain.Stadium
 
 class GameStillInProgressException(message: String?) : Exception(message) {}
 class GameFinishedException(message: String?) : Exception(message) {}
@@ -11,12 +11,22 @@ enum class GameStatus {
     FINISHED
 }
 
-class Game(val firstPlayer: Player, val secondPlayer: Player): UUIDInterface {
-    override var uuid: UUID = generateUUID()
-    private var status: GameStatus = GameStatus.IN_PROGRESS
-    private var rounds: Int = 0
-    private val firstPlayerScore = PlayerScore()
-    private val secondPlayerScore = PlayerScore()
+class Game(
+    val id: ObjectId,
+    val firstPlayer: Player,
+    val secondPlayer: Player,
+    private var status: GameStatus = GameStatus.IN_PROGRESS,
+    private var rounds: Int = 0,
+    val firstPlayerScore: PlayerScore = PlayerScore(),
+    val secondPlayerScore: PlayerScore = PlayerScore()
+) {
+    companion object {
+        fun create(firstPlayer: Player, secondPlayer: Player): Game = Game(
+            id = ObjectId.create(),
+            firstPlayer = firstPlayer,
+            secondPlayer = secondPlayer
+        )
+    }
 
     fun getStatus(): GameStatus {
         return status

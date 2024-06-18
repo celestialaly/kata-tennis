@@ -4,6 +4,7 @@ import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
+import org.example.common.valueObject.ObjectId
 import org.example.game.domain.Game
 import org.example.game.domain.GameData
 import org.example.game.domain.Player
@@ -18,7 +19,7 @@ class RepositoryTest {
         val repository = Repository()
 
         assertThrows<IllegalAccessException> {
-            repository.findById(UUID.randomUUID())
+            repository.findById(ObjectId.create())
         }
     }
 
@@ -30,11 +31,11 @@ class RepositoryTest {
             Player("Lily"),
         )
 
-        var game = Game(gameData.firstPlayer, gameData.secondPlayer)
+        var game = Game.create(gameData.firstPlayer, gameData.secondPlayer)
         game.firstPlayerWinRound()
         repository.save(game)
 
-        game = repository.findById(game.getUUID())
+        game = repository.findById(game.id)
 
         game should beInstanceOf<Game>()
         game.getFirstPlayerScore() shouldBe "15"

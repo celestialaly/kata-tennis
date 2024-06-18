@@ -1,8 +1,8 @@
 package org.example.stadium.domain
 
-import java.util.*
+import org.example.common.valueObject.ObjectId
 
-class GameSpectator(val gameUUID: UUID) {
+class GameSpectator(val gameId: ObjectId) {
     private var spectator: Int = 0
 
     fun addSpectator(number: Int = 1) {

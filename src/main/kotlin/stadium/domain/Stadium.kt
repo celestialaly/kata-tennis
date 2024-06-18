@@ -1,18 +1,18 @@
 package org.example.stadium.domain
 
+import org.example.common.valueObject.ObjectId
 import org.example.stadium.orchestration.GameNotFoundException
-import java.util.UUID
 
 class Stadium(
-    val id: StadiumId,
+    val id: ObjectId,
     val name: String,
     val capacity: Int,
     val indoor: Boolean,
-    val games: MutableMap<UUID, GameSpectator> = mutableMapOf()
+    val games: MutableMap<ObjectId, GameSpectator> = mutableMapOf()
 ) {
     companion object {
         fun create(name: String, capacity: Int, indoor: Boolean): Stadium = Stadium(
-            id = StadiumId.create(),
+            id = ObjectId.create(),
             name = name,
             capacity = capacity,
             indoor = indoor
@@ -20,19 +20,18 @@ class Stadium(
     }
 
     fun addGame(game: GameSpectator) {
-        games[game.gameUUID] = game
+        games[game.gameId] = game
     }
 
-    // TODO: change UUID to GameId
-    fun hasGame(uuid: UUID): Boolean {
-        return games.contains(uuid)
+    fun hasGame(id: ObjectId): Boolean {
+        return games.contains(id)
     }
 
-    fun getGame(uuid: UUID): GameSpectator {
-        if (!hasGame(uuid)) {
+    fun getGame(id: ObjectId): GameSpectator {
+        if (!hasGame(id)) {
             throw GameNotFoundException()
         }
 
-        return games[uuid]!!
+        return games[id]!!
     }
 }

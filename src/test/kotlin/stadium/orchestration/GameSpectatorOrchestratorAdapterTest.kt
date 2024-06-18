@@ -1,29 +1,29 @@
 package stadium.orchestration
 
 import io.kotest.matchers.shouldBe
+import org.example.common.valueObject.ObjectId
 import org.example.stadium.domain.GameSpectator
 import org.example.stadium.domain.Stadium
 import org.example.stadium.infrastructure.secondary.Repository
 import org.example.stadium.orchestration.GameSpectatorOrchestratorAdapter
 import org.example.stadium.orchestration.StadiumHasReachedMaximumCapacityException
 import org.junit.jupiter.api.*
-import stadium.common.StadiumDataset
-import stadium.common.StadiumDatasetConstants
-import java.util.UUID
+import stadium.common.StadiumFixture
+import stadium.common.StadiumFixtureConstant
 
 class GameSpectatorOrchestratorAdapterTest {
     private fun initStadium(repository: Repository): Stadium {
-        val stadium = StadiumDataset.getStadium()
+        val stadium = StadiumFixture.getStadium()
 
         repository.save(stadium)
         return stadium
     }
 
-    private fun addGameSpectator(stadium: Stadium): UUID {
-        val gameUuid = UUID.randomUUID()
-        stadium.addGame(GameSpectator(gameUuid))
+    private fun addGameSpectator(stadium: Stadium): ObjectId {
+        val gameId = ObjectId.create()
+        stadium.addGame(GameSpectator(gameId))
 
-        return gameUuid
+        return gameId
     }
 
     @Test
@@ -31,15 +31,15 @@ class GameSpectatorOrchestratorAdapterTest {
         // given
         val repository = Repository()
         val stadium = initStadium(repository)
-        val gameUUID = addGameSpectator(stadium)
+        val gameId = addGameSpectator(stadium)
         val orchestrator = GameSpectatorOrchestratorAdapter(repository)
 
         // when
         val spectatorToAdd = 10
-        orchestrator.addSpectator(spectatorToAdd, gameUUID, stadium.uuid)
+        orchestrator.addSpectator(spectatorToAdd, gameId, stadium.id)
 
         // then
-        orchestrator.getSpectatorCount(gameUUID, stadium.uuid) shouldBe spectatorToAdd
+        orchestrator.getSpectatorCount(gameId, stadium.id) shouldBe spectatorToAdd
     }
 
     @Test
@@ -47,15 +47,15 @@ class GameSpectatorOrchestratorAdapterTest {
         // given
         val repository = Repository()
         val stadium = initStadium(repository)
-        val gameUUID = addGameSpectator(stadium)
+        val gameId = addGameSpectator(stadium)
         val orchestrator = GameSpectatorOrchestratorAdapter(repository)
 
         // when
-        val spectatorToAdd = StadiumDatasetConstants.MAX_CAPACITY + 1
+        val spectatorToAdd = StadiumFixtureConstant.MAX_CAPACITY + 1
 
         // then
         assertThrows<StadiumHasReachedMaximumCapacityException> {
-            orchestrator.addSpectator(spectatorToAdd, gameUUID, stadium.uuid)
+            orchestrator.addSpectator(spectatorToAdd, gameId, stadium.id)
         }
     }
 }

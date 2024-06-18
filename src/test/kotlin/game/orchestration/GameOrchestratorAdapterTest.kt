@@ -2,6 +2,7 @@ package game.orchestration
 
 import io.kotest.matchers.collections.shouldBeOneOf
 import io.kotest.matchers.shouldBe
+import org.example.common.valueObject.ObjectId
 import org.example.game.domain.GameData
 import org.example.game.domain.GameStillInProgressException
 import org.example.game.domain.Player
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.*
 import java.util.*
 
 class GameOrchestratorAdapterTest {
-    private fun getIdFromNewGame(repository: Repository): UUID {
+    private fun getIdFromNewGame(repository: Repository): ObjectId {
         val gameData = GameData(
             Player("Julie"),
             Player("Lily"),
@@ -21,7 +22,7 @@ class GameOrchestratorAdapterTest {
         val adapter = GameOrchestratorAdapter.create(repository, gameData)
         adapter.playMatch()
 
-        return adapter.getGameUUID()
+        return adapter.getGameId()
     }
 
     @Test
@@ -48,6 +49,6 @@ class GameOrchestratorAdapterTest {
         val repository = Repository()
         val gameId = getIdFromNewGame(repository)
 
-        GameOrchestratorAdapter.load(repository, gameId).getGameUUID() shouldBe gameId
+        GameOrchestratorAdapter.load(repository, gameId).getGameId() shouldBe gameId
     }
 }

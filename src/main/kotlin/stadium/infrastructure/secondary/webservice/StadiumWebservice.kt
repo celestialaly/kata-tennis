@@ -16,7 +16,11 @@ class StadiumWebservice {
         "Accor Arena" to listOf("Accor Arena", "15500", "true", "Paris", "France"),
     )
 
-    fun retrieveStadiumInformation(name: String): Stadium {
+    fun convertToDomain(information: StadiumInformation): Stadium {
+        return Stadium.create(information.name, information.spectatorCapacity, information.indoor)
+    }
+
+    fun retrieveStadiumInformation(name: String): StadiumInformation {
         if (stadiums.containsKey(name)) {
             // convert from API format to StadiumInformation
             return convertDataFromApi(stadiums[name]!!)
@@ -33,9 +37,5 @@ class StadiumWebservice {
             data[API_INDEX_CITY],
             data[API_INDEX_COUNTRY]
         )
-    }
-
-    private fun convertToDomain(StadiumInformation): Stadium {
-
     }
 }

@@ -3,16 +3,17 @@ package stadium.common
 import org.example.common.acl.StadiumInformation
 import org.example.stadium.domain.Stadium
 
-object StadiumDatasetConstants {
+object StadiumFixtureConstant {
+    const val NAME = "Rolland Garros"
     const val MAX_CAPACITY = 20
 }
 
-class StadiumDataset {
+class StadiumFixture {
     companion object {
-        private fun getStadiumInformation(): StadiumInformation {
+        fun getStadiumInformation(): StadiumInformation {
             return StadiumInformation(
-                "Rolland Garros",
-                StadiumDatasetConstants.MAX_CAPACITY,
+                StadiumFixtureConstant.NAME,
+                StadiumFixtureConstant.MAX_CAPACITY,
                 true,
                 "Paris",
                 "France"

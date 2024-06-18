@@ -13,7 +13,7 @@ class GameTest {
         val player1 = Player("Julie")
         val player2 = Player("Lily")
 
-        return Game(player1, player2)
+        return Game.create(player1, player2)
     }
 
     private fun setDraw(game: Game) {
@@ -33,7 +33,7 @@ class GameTest {
         val player2 = Player("Lily")
 
         // When
-        val game = Game(player1, player2)
+        val game = Game.create(player1, player2)
 
         // Then
         game should {

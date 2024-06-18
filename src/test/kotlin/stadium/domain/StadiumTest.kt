@@ -1,36 +1,36 @@
 package stadium.domain
 
 import io.kotest.matchers.shouldBe
+import org.example.common.valueObject.ObjectId
 import org.example.stadium.domain.GameSpectator
 import org.example.stadium.orchestration.GameNotFoundException
 import org.junit.jupiter.api.*
-import stadium.common.StadiumDataset
-import java.util.*
+import stadium.common.StadiumFixture
 
 class StadiumTest {
     @Test
     fun `should be able to add a new game`() {
         // given
-        val stadium = StadiumDataset.getStadium()
+        val stadium = StadiumFixture.getStadium()
 
         // when
-        val gameUUID = UUID.randomUUID()
-        stadium.addGame(GameSpectator(gameUUID))
+        val gameId = ObjectId.create()
+        stadium.addGame(GameSpectator(gameId))
 
         // then
-        stadium.hasGame(gameUUID) shouldBe true
+        stadium.hasGame(gameId) shouldBe true
     }
 
     @Test
     fun `should throw error on game not found`() {
         // given
-        val stadium = StadiumDataset.getStadium()
+        val stadium = StadiumFixture.getStadium()
 
         // when
-        val gameUUID = UUID.randomUUID()
+        val gameId = ObjectId.create()
 
         // then
-        stadium.hasGame(gameUUID) shouldBe false
-        assertThrows<GameNotFoundException> { stadium.getGame(gameUUID) }
+        stadium.hasGame(gameId) shouldBe false
+        assertThrows<GameNotFoundException> { stadium.getGame(gameId) }
     }
 }

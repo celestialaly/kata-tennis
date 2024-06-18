@@ -1,30 +1,42 @@
 package org.example.stadium.orchestration
 
+import org.example.common.valueObject.ObjectId
 import org.example.stadium.domain.GameSpectator
 import org.example.stadium.domain.Stadium
 import org.example.stadium.infrastructure.secondary.Repository
-import java.util.UUID
+import org.example.stadium.infrastructure.secondary.webservice.StadiumWebservice
 
 class GameAlreadyExistException: Exception()
 
 interface StadiumOrchestrator {
-    fun addGame(stadiumUUID: UUID, gameUUID: UUID)
-    fun isIndoor(id: UUID): Boolean?
+    fun create(name: String): Stadium
+    fun addGame(stadiumId: ObjectId, gameId: ObjectId)
+    fun isIndoor(id: ObjectId): Boolean
 }
 
-class StadiumOrchestratorAdapter(private val repository: Repository): StadiumOrchestrator {
-    override fun addGame(stadiumUUID: UUID, gameUUID: UUID) {
-        val stadium: Stadium = repository.findById(stadiumUUID)
+class StadiumOrchestratorAdapter(
+    private val repository: Repository,
+    private val stadiumWebservice: StadiumWebservice
+): StadiumOrchestrator {
+    override fun create(name: String): Stadium {
+        val stadium = stadiumWebservice.convertToDomain(stadiumWebservice.retrieveStadiumInformation(name))
+        repository.save(stadium)
 
-        if (stadium.hasGame(gameUUID)) {
+        return stadium
+    }
+
+    override fun addGame(stadiumId: ObjectId, gameId: ObjectId) {
+        val stadium: Stadium = repository.findById(stadiumId)
+
+        if (stadium.hasGame(gameId)) {
             throw GameAlreadyExistException()
         }
 
-        stadium.addGame(GameSpectator(gameUUID))
+        stadium.addGame(GameSpectator(gameId))
         repository.save(stadium)
     }
 
-    override fun isIndoor(id: UUID): Boolean? {
-        return repository.findById(id)?.indoor
+    override fun isIndoor(id: ObjectId): Boolean {
+        return repository.findById(id).indoor
     }
 }
