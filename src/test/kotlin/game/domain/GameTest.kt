@@ -4,8 +4,6 @@ import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.example.game.domain.*
-import org.example.stadium.domain.GameSpectator
-import org.example.stadium.domain.Stadium
 import org.junit.jupiter.api.*
 
 class GameTest {
@@ -27,6 +25,15 @@ class GameTest {
     }
 
     @Test
+    fun `should throw error on retrieving winner when game still in progress`() {
+        val game: Game = initGame()
+
+        assertThrows<GameStillInProgressException> {
+            game.getWinner()
+        }
+    }
+
+    @Test
     fun `should have status in progress with players`() {
         // Given
         val player1 = Player("Julie")
@@ -44,7 +51,7 @@ class GameTest {
     }
 
     @Test
-    fun `should players play 2 rounds and each players get 1 point`() {
+    fun `should players play 2 rounds and have score be 15-15`() {
         val game: Game = initGame()
 
         game.getRounds() shouldBeExactly 0
@@ -68,16 +75,21 @@ class GameTest {
     fun `should players play a match and player 1 win`() {
         val game: Game = initGame()
 
-        assertThrows<GameStillInProgressException> {
-            game.getWinner()
-        }
-
         for (i in 1..4) {
             game.firstPlayerWinRound()
         }
 
         game.getStatus() shouldBe GameStatus.FINISHED
         game.getWinner() shouldBe game.firstPlayer
+    }
+
+    @Test
+    fun `should throw an error if trying to play a round when game is finished`() {
+        val game: Game = initGame()
+
+        for (i in 1..4) {
+            game.firstPlayerWinRound()
+        }
 
         assertThrows<GameFinishedException> {
             game.firstPlayerWinRound()
@@ -85,7 +97,7 @@ class GameTest {
     }
 
     @Test
-    fun `should players draws`() {
+    fun `should players draws at 40-40 and keep the game in progress`() {
         val game = initGame()
         setDraw(game)
 

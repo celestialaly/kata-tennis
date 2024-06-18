@@ -1,31 +1,35 @@
 package org.example.game.infrastructure.secondary
 
-import org.example.common.interfaces.InMemoryRepositoryInterface
-import org.example.common.valueObject.ObjectId
 import org.example.game.domain.Game
+import org.example.game.domain.GameId
 import org.example.game.domain.Player
-import java.util.UUID
 
-class Repository : InMemoryRepositoryInterface<Game> {
-    private val store: MutableMap<ObjectId, Game> = mutableMapOf()
+interface GameReadRepository {
+    fun findById(id: GameId): Game?
+    fun findGamesByPlayer(player: Player): List<Game>
+}
 
-    override fun save(entity: Game) {
-        store[entity.id] = entity
+interface GameWriteRepository: GameReadRepository {
+    fun save(game: Game)
+    fun remove(game: Game)
+}
+
+class Repository : GameWriteRepository {
+    private val store: MutableMap<GameId, Game> = mutableMapOf()
+
+    override fun save(game: Game) {
+        store[game.id] = game
     }
 
-    override fun remove(entity: Game) {
-        store.remove(entity.id)
+    override fun remove(game: Game) {
+        store.remove(game.id)
     }
 
-    override fun findById(id: ObjectId): Game {
-        if (!store.contains(id)) {
-            throw IllegalAccessException("Repository does not contain a game with this UUID")
-        }
-
-        return store[id]!!
+    override fun findById(id: GameId): Game? {
+        return store[id]
     }
 
-    fun findGamesByPlayer(player: Player): List<Game> {
+    override fun findGamesByPlayer(player: Player): List<Game> {
         return store
             .filter { it.value.firstPlayer == player || it.value.secondPlayer == player }
             .map { it.value }

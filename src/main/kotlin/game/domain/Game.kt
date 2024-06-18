@@ -1,8 +1,5 @@
 package org.example.game.domain
 
-import org.example.common.valueObject.ObjectId
-import org.example.stadium.domain.Stadium
-
 class GameStillInProgressException(message: String?) : Exception(message) {}
 class GameFinishedException(message: String?) : Exception(message) {}
 
@@ -12,17 +9,17 @@ enum class GameStatus {
 }
 
 class Game(
-    val id: ObjectId,
+    val id: GameId,
     val firstPlayer: Player,
     val secondPlayer: Player,
     private var status: GameStatus = GameStatus.IN_PROGRESS,
     private var rounds: Int = 0,
-    val firstPlayerScore: PlayerScore = PlayerScore(),
-    val secondPlayerScore: PlayerScore = PlayerScore()
+    private val firstPlayerScore: PlayerScore = PlayerScore(),
+    private val secondPlayerScore: PlayerScore = PlayerScore()
 ) {
     companion object {
         fun create(firstPlayer: Player, secondPlayer: Player): Game = Game(
-            id = ObjectId.create(),
+            id = GameId.create(),
             firstPlayer = firstPlayer,
             secondPlayer = secondPlayer
         )
